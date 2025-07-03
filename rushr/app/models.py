@@ -1,0 +1,19 @@
+# app/models.py
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True)
+    password = Column(String)
+
+class Ride(Base):
+    __tablename__ = "rides"
+    id = Column(Integer, primary_key=True, index=True)
+    driver_id = Column(Integer, ForeignKey("users.id"))
+    leaving_from = Column(String)
+    going_to = Column(String)
+    seats = Column(Integer)

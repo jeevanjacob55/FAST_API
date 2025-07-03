@@ -1,0 +1,31 @@
+# Core
+fastapi
+uvicorn[standard]
+jinja2
+python-dotenv
+
+# Database & ORM
+sqlalchemy
+databases[postgresql]      # Async DB support
+psycopg2-binary           # PostgreSQL driver
+alembic                   # DB migrations
+
+# Validation & Security
+passlib[bcrypt]           # Password hashing
+python-jose[cryptography] # JWT token handling
+
+# Form & File Uploads
+python-multipart
+
+# Testing
+pytest
+pytest-asyncio
+httpx                      # Async HTTP client for testing
+pytest-cov                 # Coverage reporting
+
+# Linting & Formatting (Dev)
+black
+flake8
+isort
+mypy                       # Optional: static type checking
+
