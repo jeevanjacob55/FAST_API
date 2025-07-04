@@ -17,3 +17,5 @@ class Ride(Base):
     leaving_from = Column(String)
     going_to = Column(String)
     seats = Column(Integer)
+    polyline = Column(String, nullable=True)  # new field
+

@@ -16,6 +16,14 @@ class RideCreate(BaseModel):
     going_to: str
     seats: int
 
-class RideOut(RideCreate):
+class RideOut(BaseModel):
     id: int
+    leaving_from: str
+    going_to: str
+    seats: int
     driver_id: int
+    polyline: str  # add this
+    class Config:
+        orm_mode = True
+
+

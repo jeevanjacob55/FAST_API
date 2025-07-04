@@ -6,3 +6,8 @@ __pycache__/
 .Python
 db.sqlite3
 rushr.db
+.env
+*.env
+*.DS_Store
+*.log
+*.coverage
