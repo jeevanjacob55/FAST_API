@@ -8,3 +8,4 @@ create_tables()
 
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(rides.router, prefix="/rides", tags=["Rides"])
+
