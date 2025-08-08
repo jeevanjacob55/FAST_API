@@ -15,6 +15,7 @@ class RideCreate(BaseModel):
     leaving_from: str
     going_to: str
     seats: int
+    polyline: str
 
 class RideOut(BaseModel):
     id: int
@@ -26,4 +27,8 @@ class RideOut(BaseModel):
     class Config:
         orm_mode = True
 
-
+class RideSearch(BaseModel):
+    start_lat: float
+    start_lon: float
+    end_lat: float
+    end_lon: float

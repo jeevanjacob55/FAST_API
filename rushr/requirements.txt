@@ -29,3 +29,4 @@ flake8
 isort
 mypy                       # Optional: static type checking
 
+requests
