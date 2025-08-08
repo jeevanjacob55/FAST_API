@@ -23,8 +23,8 @@ def on_startup():
 
 # Include your routers
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
-app.include_router(rides.router, prefix="/rides", tags=["Rides"])
-
+# app.include_router(rides.router, prefix="/rides", tags=["Rides"])
+app.include_router(rides.router)
 
 @app.get("/", tags=["Root"])
 def read_root():

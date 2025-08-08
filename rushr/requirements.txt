@@ -28,5 +28,7 @@ black
 flake8
 isort
 mypy                       # Optional: static type checking
-
+jose
 requests
+polyline
+haversine
