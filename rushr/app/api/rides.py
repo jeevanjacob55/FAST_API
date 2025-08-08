@@ -2,15 +2,17 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db import get_db
+
 from app.schemas import RideCreate, RideOut
 from app.models import Ride
+from fastapi import HTTPException
 from app.utils.google_maps import fetch_route_polyline #fetches polyline from Google Maps
 
 
 router = APIRouter()
 
-@router.post("/publish", response_model=schemas.RideOut)
-def publish_ride(ride: schemas.RideCreate, db: Session = Depends(get_db)):
+@router.post("/publish", response_model=RideOut)
+def publish_ride(ride: RideCreate, db: Session = Depends(get_db)):
     try:
         polyline = fetch_route_polyline(ride.leaving_from, ride.going_to)
     except Exception as e:

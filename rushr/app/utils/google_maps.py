@@ -17,7 +17,7 @@ def fetch_route_polyline(origin: str, destination: str) -> str:
     params = {
         "origin": origin,
         "destination": destination,
-        "key": GOOGLE_MAPS_API_KEY
+        "key": "AIzaSyCeULOXYiziLk95dT7Ak2-71DYZj1hRWuw"
     }
 
     response = requests.get(url, params=params)
