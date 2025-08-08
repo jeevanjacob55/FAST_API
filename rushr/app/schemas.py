@@ -41,3 +41,4 @@ class RideSearch(BaseModel):
     start_lon: float
     end_lat: float
     end_lon: float
+    tolerance: float = 5.0 # km tolerance for matching
