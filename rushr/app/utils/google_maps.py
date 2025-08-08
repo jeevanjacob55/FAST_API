@@ -3,11 +3,9 @@
 import os
 import requests
 from dotenv import load_dotenv
-
 load_dotenv()
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-
-
+print(GOOGLE_MAPS_API_KEY)
 def fetch_route_polyline(origin: str, destination: str) -> str:
     """
     Calls Google Directions API and returns the encoded polyline
@@ -17,13 +15,13 @@ def fetch_route_polyline(origin: str, destination: str) -> str:
     params = {
         "origin": origin,
         "destination": destination,
-        "key": "AIzaSyCeULOXYiziLk95dT7Ak2-71DYZj1hRWuw"
+        "key": GOOGLE_MAPS_API_KEY
     }
 
     response = requests.get(url, params=params)
     data = response.json()
 
-    if data["status"] != "OK" or not data["routes"]:
-        raise Exception("Failed to fetch route from Google Maps")
+    if data.get("status") != "OK" or not data.get("routes"):
+        raise Exception(f"Google Maps API error: {data.get('status')} - {data.get('error_message')}")
 
     return data["routes"][0]["overview_polyline"]["points"]

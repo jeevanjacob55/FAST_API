@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from app.api import auth, rides
 from app.db import create_tables
 
+
 # Create the main FastAPI app instance
 app = FastAPI(
     title="Carpooling API"
