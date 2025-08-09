@@ -1,3 +1,49 @@
+/* === NEW LANDING PAGE STYLES === */
+.landing-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  transition: opacity 0.5s ease-out;
+  opacity: 1;
+}
+
+.landing-logo {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.landing-page.fade-out {
+  opacity: 0;
+}
+
+.app-container {
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+}
+
+.app-container.visible {
+  opacity: 1;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
 /* General Body and Font Styles */
 body {
   margin: 0;
@@ -83,22 +129,24 @@ body {
 }
 
 .nav-links a:hover {
-  color: #a40e0e; /* hover:text-blue-600 */
+  color: #00f6ff; /* Neon Blue */
 }
 
 .button-primary {
-  background-color: #a50f0f; /* bg-blue-600 */
-  color: #ffffff;
+  background-color: #00f6ff; /* Neon Blue */
+  color: #003c40; /* Dark text for contrast */
+  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.5);
   padding: 0.5rem 1rem;
   border-radius: 9999px;
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .button-primary:hover {
-  background-color: #c50707; /* hover:bg-blue-700 */
+  background-color: #5effff;
+  box-shadow: 0 0 15px #00f6ff;
 }
 
 
@@ -193,14 +241,15 @@ body {
 
 .input-field:focus {
   outline: none;
-  border-color: #bc1313;
-  box-shadow: 0 0 0 2px rgba(246, 39, 39, 0.5);
+  border-color: #00f6ff;
+  box-shadow: 0 0 0 2px rgba(0, 246, 255, 0.5);
 }
 
 .search-button {
   width: 100%;
-  background-color: #b30f0f;
-  color: #ffffff;
+  background-color: #00f6ff;
+  color: #003c40;
+  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.5);
   padding: 0.75rem;
   border-radius: 0.5rem;
   font-weight: 600;
@@ -211,11 +260,12 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: background-color 0.2s, transform 0.2s;
+  transition: all 0.2s;
 }
 
 .search-button:hover {
-  background-color: #a50707;
+  background-color: #5effff;
+  box-shadow: 0 0 15px #00f6ff;
   transform: scale(1.05);
 }
 
@@ -295,7 +345,7 @@ body {
 .price {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #a90c0c;
+  color: #00c4cc;
 }
 
 .price-per-seat {
@@ -360,7 +410,7 @@ body {
 }
 
 .info-icon-wrapper {
-  background-color: #dbeafe; /* bg-blue-100 */
+  background-color: #cffafe; 
   padding: 1.5rem;
   border-radius: 9999px;
   margin-bottom: 1rem;
@@ -369,7 +419,7 @@ body {
 .info-icon {
   width: 3rem;
   height: 3rem;
-  color: #b41316;
+  color: #0891b2;
 }
 
 .info-title {
@@ -435,35 +485,20 @@ body {
 }
 
 .footer-links a:hover {
-  color: #da2b4b; /* hover:text-blue-400 */
+  color: #00f6ff; 
 }
 
-/* === NEW LOGIN PAGE STYLES === */
-.button-login {
-  background-color: #ef4444; /* red-500 */
-  color: #ffffff;
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.button-login:hover {
-  background-color: #dc2626; /* red-600 */
-}
-
-.login-page-container {
+/* Auth Page Styles (Login, SignUp, PostRide) */
+.auth-page-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 80px); /* Adjust 80px based on your header height */
+  min-height: calc(100vh - 80px); 
   padding: 2rem;
 }
 
-.login-form-card {
+.auth-form-card {
   background-color: white;
   padding: 2.5rem;
   border-radius: 0.75rem;
@@ -473,19 +508,19 @@ body {
   text-align: center;
 }
 
-.login-page-title {
+.auth-page-title {
   font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 2rem;
 }
 
-.login-page-form {
+.auth-form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.login-page-input {
+.auth-input {
   width: 100%;
   box-sizing: border-box;
   padding: 0.75rem 1rem;
@@ -494,32 +529,127 @@ body {
   font-size: 1rem;
 }
 
-.login-page-input:focus {
+.auth-input:focus {
   outline: none;
-  border-color: #bc1313;
-  box-shadow: 0 0 0 2px rgba(246, 39, 39, 0.5);
+  border-color: #00f6ff;
+  box-shadow: 0 0 0 2px rgba(0, 246, 255, 0.5);
 }
 
-.login-page-button {
+.auth-button {
   width: 100%;
-  background-color: #b30f0f;
-  color: #ffffff;
+  background-color: #00f6ff;
+  color: #003c40;
+  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.5);
   padding: 0.75rem;
   border-radius: 0.5rem;
   font-weight: 600;
   font-size: 1.125rem;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
-.login-page-button:hover {
-  background-color: #a50707;
+.auth-button:hover {
+  background-color: #5effff;
+  box-shadow: 0 0 15px #00f6ff;
 }
 
-.back-link {
+.auth-link-container {
   margin-top: 1.5rem;
-  color: #a50707;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.auth-link {
+  display: inline-block;
+  color: #00c4cc;
   text-decoration: none;
   font-weight: 600;
+}
+
+.button-signup {
+  background-color: transparent;
+  color: #00c4cc;
+  border: 2px solid #00f6ff;
+  padding: calc(0.5rem - 2px) calc(1rem - 2px);
+  border-radius: 9999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.button-signup:hover {
+  background-color: #00f6ff;
+  color: #003c40;
+}
+
+.button-login {
+  background-color: #00f6ff;
+  color: #003c40;
+  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.5);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.button-login:hover {
+  background-color: #5effff;
+  box-shadow: 0 0 15px #00f6ff;
+}
+
+/* Post Ride Page Specifics */
+.post-ride-form-card {
+  max-width: 48rem;
+}
+
+.post-ride-form .form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .post-ride-form .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.post-ride-form .form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.post-ride-form label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.post-ride-form .submit-button {
+  grid-column: 1 / -1; 
+  margin-top: 1rem;
+}
+
+/* === NEW OTP PAGE STYLES === */
+.otp-page-subtitle {
+  margin-bottom: 2rem;
+  color: #4b5563;
+}
+
+.otp-input {
+  font-size: 1.5rem;
+  letter-spacing: 1rem;
+  text-align: center;
+  width: 100%;
+  max-width: 20rem;
+}
+
+.logo-image {
+  height: 40px; 
+  width: auto;
 }
