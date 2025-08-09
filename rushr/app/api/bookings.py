@@ -61,3 +61,40 @@ def book_ride(ride_id: int, payload: BookingCreate, db: Session = Depends(get_db
         raise HTTPException(status_code=500, detail=f"Booking failed: {str(e)}")
 
     return booking
+
+#cancel the route, the varialbes are passed in url format
+@router.post("/{ride_id}/cancel", response_model=BookingOut)
+def cancel_booking(ride_id: int, user_id: Optional[int] = None, db: Session = Depends(get_db)):
+    """
+    Cancel a confirmed booking for a ride and increment seats.
+    For now user_id comes from query param (replace with auth in future).
+    """
+    user_id = user_id or 1  # placeholder until auth is ready
+    print(f"DEBUG: Cancel request received: ride_id={ride_id}, user_id={user_id}")
+
+    booking = db.query(Booking).filter_by(ride_id=ride_id, user_id=user_id, status="confirmed").first()
+    if not booking:
+        print(f"DEBUG: No confirmed booking found for user {user_id} on ride {ride_id}")
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    ride = db.query(Ride).filter_by(id=ride_id).first()
+    if not ride:
+        print(f"DEBUG: Ride not found for ride_id={ride_id}")
+        raise HTTPException(status_code=404, detail="Ride not found")
+
+    try:
+        print("DEBUG: Cancelling booking and incrementing seats...")
+        booking.status = "cancelled"
+        ride.seats = ride.seats + 1
+        db.commit()
+        db.refresh(booking)
+        db.refresh(ride)
+        print(f"DEBUG: Booking cancelled: id={booking.id}, ride.seats now={ride.seats}")
+    except Exception as e:
+        db.rollback()
+        print("DEBUG: Exception during cancellation:", str(e))
+        raise HTTPException(status_code=500, detail=f"Cancellation failed: {str(e)}")
+
+    return booking
+#cancel the booking for the ride
+# Note: This code assumes that the ride_id and user_id are valid and exist in the database.

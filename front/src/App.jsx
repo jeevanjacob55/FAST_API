@@ -74,10 +74,8 @@ const HomePage = ({ rides, setRides, setIsLoadingRides, setErrorRides }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          start_lat: startCoords.lat,
-          start_lon: startCoords.lon,
-          end_lat: endCoords.lat,
-          end_lon: endCoords.lon,
+          leaving_from: fromLocation, // CORRECT
+          going_to: toLocation,       // CORRECT
         }),
       });
 

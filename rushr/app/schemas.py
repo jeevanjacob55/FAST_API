@@ -3,12 +3,24 @@ from datetime import date, time, datetime
 from typing import Optional
 
 # --- Auth Schemas ---
+# app/schemas.py (Pydantic v2 style)
+from pydantic import BaseModel, field_validator
+
 class UserCreate(BaseModel):
     full_name: str
-    email: EmailStr
+    email: str
     contact_number: str
     aadhaar_number: str
     password: str
+
+    @field_validator("aadhaar_number")
+    @classmethod
+    def check_aadhaar(cls, v):
+        from app.utils.validation import is_valid_aadhaar
+        if not is_valid_aadhaar(v):
+            raise ValueError("Invalid Aadhaar number")
+        return v
+
 
 class LoginRequest(BaseModel):
     email: EmailStr
