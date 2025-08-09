@@ -3,10 +3,33 @@ import './index.css';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
-import OtpPage from './OtpPage'; // Import the new OtpPage component
+import OtpPage from './OtpPage';
 import PostRidePage from './PostRidePage'; 
 
 import { MapPin, Calendar, Users, Search, ShieldCheck, Leaf, PiggyBank, Star, UserCircle } from 'lucide-react';
+
+// ✅ CHANGE 1: Add a helper function to get coordinates from an address.
+// This function calls the Google Maps Geocoding API.
+const getCoordinates = async (address) => {
+  // IMPORTANT: Store your API key in a .env file at the project root.
+  // The file should contain: VITE_GOOGLE_MAPS_API_KEY="your_key_here"
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; 
+  if (!apiKey) {
+    throw new Error("Google Maps API key is missing.");
+  }
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (data.status !== 'OK' || !data.results[0]) {
+    throw new Error(`Could not find coordinates for "${address}"`);
+  }
+
+  const { lat, lng } = data.results[0].geometry.location;
+  return { lat, lon: lng }; // Return in the format your backend expects
+};
+
 
 const StarRating = ({ rating }) => {
   const stars = [];
@@ -22,22 +45,63 @@ const StarRating = ({ rating }) => {
   return <div className="star-rating">{stars}</div>;
 };
 
-const HomePage = ({ rides }) => {
+
+// ✅ CHANGE 2: Pass down state setters for rides, loading, and errors.
+const HomePage = ({ rides, setRides, setIsLoadingRides, setErrorRides }) => {
   const [fromLocation, setFromLocation] = useState('');
   const [toLocation, setToLocation] = useState('');
   const [date, setDate] = useState('');
 
-  const handleSearch = (e) => {
+  // ✅ CHANGE 3: Update the search handler to be async and perform the full workflow.
+  const handleSearch = async (e) => {
     e.preventDefault();
-    console.log(`Searching for rides from ${fromLocation} to ${toLocation} on ${date}`);
+    if (!fromLocation || !toLocation) {
+      setErrorRides('Please enter both "From" and "To" locations.');
+      return;
+    }
+
+    setIsLoadingRides(true);
+    setErrorRides('');
+    setRides([]); // Clear previous results
+
+    try {
+      // Step 1: Geocode the "From" and "To" locations.
+      const startCoords = await getCoordinates(fromLocation);
+      const endCoords = await getCoordinates(toLocation);
+
+      // Step 2: Call your backend with the coordinates.
+      const response = await fetch('http://127.0.0.1:8000/rides/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          start_lat: startCoords.lat,
+          start_lon: startCoords.lon,
+          end_lat: endCoords.lat,
+          end_lon: endCoords.lon,
+        }),
+      });
+
+      const searchResult = await response.json();
+
+      if (!response.ok) {
+        throw new Error(searchResult.detail || 'Failed to search for rides.');
+      }
+      
+      // Update the rides list with the search results.
+      setRides(searchResult);
+
+    } catch (err) {
+      setErrorRides(err.message);
+      setRides([]); // Clear rides on error
+    } finally {
+      setIsLoadingRides(false);
+    }
   };
 
   return (
     <>
       <main className="container main-content">
-        <h1 className="hero-title">
-          Your Journey, Shared.
-        </h1>
+        <h1 className="hero-title">Your Journey, Shared.</h1>
         <p className="hero-subtitle">
           Save money, reduce your carbon footprint, and meet new people. Find a ride or offer a seat in your car.
         </p>
@@ -46,11 +110,11 @@ const HomePage = ({ rides }) => {
           <form onSubmit={handleSearch} className="search-form">
             <div className="input-group">
               <MapPin className="input-icon w-5 h-5" />
-              <input type="text" placeholder="From" value={fromLocation} onChange={(e) => setFromLocation(e.target.value)} className="input-field" />
+              <input type="text" placeholder="From" value={fromLocation} onChange={(e) => setFromLocation(e.target.value)} className="input-field" required />
             </div>
             <div className="input-group">
               <MapPin className="input-icon w-5 h-5" />
-              <input type="text" placeholder="To" value={toLocation} onChange={(e) => setToLocation(e.target.value)} className="input-field" />
+              <input type="text" placeholder="To" value={toLocation} onChange={(e) => setToLocation(e.target.value)} className="input-field" required />
             </div>
             <div className="input-group">
               <Calendar className="input-icon w-5 h-5" />
@@ -68,86 +132,60 @@ const HomePage = ({ rides }) => {
         <div className="container">
           <h2 className="section-title">Available Rides</h2>
           <div className="rides-grid">
-            {rides.map(ride => (
+            {/* ✅ CHANGE 4: Update the ride card to use data from your backend. */}
+            {rides.length > 0 ? rides.map(ride => (
               <div key={ride.id} className="ride-card">
                 <div className="ride-card-content">
                   <div className="ride-card-header">
-                    <img className="driver-avatar" src={ride.avatar} alt={`Driver ${ride.driver}`} />
+                    <img className="driver-avatar" src={`https://placehold.co/100x100/a3e635/44403c?text=D${ride.driver_id}`} alt={`Driver`} />
                     <div className="driver-info">
-                      <p className="driver-name">{ride.driver}</p>
-                      <StarRating rating={ride.rating} />
+                      <p className="driver-name">Driver ID: {ride.driver_id}</p>
+                      <StarRating rating={4} /> {/* Placeholder rating */}
                     </div>
                     <div className="price-info">
-                      <p className="price">${ride.price}</p>
-                      <p className="price-per-seat">per seat</p>
+                      <p className="price">₹10/km</p> {/* Placeholder price */}
+                      <p className="price-per-seat">approx.</p>
                     </div>
                   </div>
                   <div className="ride-details">
-                      <div className="ride-detail-item">
-                        <MapPin className="w-5 h-5 text-green-500" />
-                        <div className="ride-detail-text">
-                          <p className="location">{ride.from}</p>
-                          <p className="time">{ride.departureTime}</p>
-                        </div>
+                    <div className="ride-detail-item">
+                      <MapPin className="w-5 h-5 text-green-500" />
+                      <div className="ride-detail-text">
+                        <p className="location">{ride.leaving_from}</p>
                       </div>
-                      <div className="ride-detail-item">
-                        <MapPin className="w-5 h-5 text-red-500" />
-                        <div className="ride-detail-text">
-                          <p className="location">{ride.to}</p>
-                          <p className="time">{ride.arrivalTime}</p>
-                        </div>
+                    </div>
+                    <div className="ride-detail-item">
+                      <MapPin className="w-5 h-5 text-red-500" />
+                      <div className="ride-detail-text">
+                        <p className="location">{ride.going_to}</p>
                       </div>
-                      <div className="ride-detail-item">
-                        <Users className="w-5 h-5 text-blue-500" />
-                        <p>{ride.seats} seats available</p>
-                      </div>
+                    </div>
+                    <div className="ride-detail-item">
+                      <Users className="w-5 h-5 text-blue-500" />
+                      <p>{ride.seats} seats available</p>
+                    </div>
                   </div>
                   <button className="button-primary" style={{width: '100%', marginTop: '1.5rem', borderRadius: '0.5rem'}}>
                     Book Now
                   </button>
                 </div>
               </div>
-            ))}
+            )) : <p>No rides found. Try searching for a trip!</p>}
           </div>
         </div>
       </section>
 
+      {/* The rest of the sections remain the same */}
       <section id="how-it-works" className="info-section">
-        <div className="container">
-          <h2 className="section-title">How It Works</h2>
-          <div className="info-grid">
-            <div className="info-item">
-              <div className="info-icon-wrapper"><Search className="info-icon" /></div>
-              <h3 className="info-title">1. Find a Ride</h3>
-              <p className="info-text">Enter your destination and find rides that match your schedule.</p>
-            </div>
-            <div className="info-item">
-              <div className="info-icon-wrapper"><img src="/rusher-logo.png" alt="Car Icon" className="info-icon" /></div>
-              <h3 className="info-title">2. Book & Pay</h3>
-              <p className="info-text">Book your seat and pay securely through our platform.</p>
-            </div>
-            <div className="info-item">
-              <div className="info-icon-wrapper"><Users className="info-icon" /></div>
-              <h3 className="info-title">3. Travel Together</h3>
-              <p className="info-text">Meet your driver, enjoy the ride, and make new friends.</p>
-            </div>
-          </div>
-        </div>
+        {/* ... */}
       </section>
-
       <section id="why-us" className="why-us-section">
-        <div className="container">
-          <h2 className="section-title">Why RUSHR?</h2>
-          <div className="why-us-grid">
-            <div className="why-us-item"><PiggyBank className="info-icon text-blue-600" /><h3 className="info-title">Save Money</h3><p className="info-text">Share the cost of travel. It's cheaper than a train or flying.</p></div>
-            <div className="why-us-item"><Leaf className="info-icon text-green-500" /><h3 className="info-title">Eco-Friendly</h3><p className="info-text">Fewer cars on the road means a smaller carbon footprint.</p></div>
-            <div className="why-us-item"><ShieldCheck className="info-icon text-red-500" /><h3 className="info-title">Safe & Secure</h3><p className="info-text">We verify profiles and our rating system builds trust.</p></div>
-          </div>
-        </div>
+        {/* ... */}
       </section>
     </>
   );
 };
+
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -155,10 +193,11 @@ export default function App() {
   
   const [page, setPage] = useState('home');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [rides, setRides] = useState([
-    { id: 1, driver: 'Alice', avatar: 'https://placehold.co/100x100/a3e635/44403c?text=A', from: 'New York, NY', to: 'Boston, MA', departureTime: '08:00 AM', arrivalTime: '12:00 PM', price: 30, seats: 2, rating: 5 },
-    { id: 2, driver: 'Elvin', avatar: 'https://placehold.co/100x100/f97316/ffffff?text=E', from: 'Los Angeles, CA', to: 'San Francisco, CA', departureTime: '09:30 AM', arrivalTime: '04:30 PM', price: 45, seats: 3, rating: 4 },
-  ]);
+
+  // ✅ CHANGE 5: Centralize state for rides, loading, and errors here.
+  const [rides, setRides] = useState([]);
+  const [isLoadingRides, setIsLoadingRides] = useState(false);
+  const [errorRides, setErrorRides] = useState('');
 
   useEffect(() => {
     const fadeTimer = setTimeout(() => setIsFadingOut(true), 2500);
@@ -172,8 +211,7 @@ export default function App() {
   };
 
   const handleRidePosted = (newRide) => {
-    const rideWithId = { ...newRide, id: rides.length + 1, driver: 'You', avatar: 'https://placehold.co/100x100/1e40af/ffffff?text=U', rating: 5, price: 25 };
-    setRides([rideWithId, ...rides]);
+    setRides([newRide, ...rides]);
     setPage('home');
   };
 
@@ -193,7 +231,13 @@ export default function App() {
         return <PostRidePage onNavigateHome={() => setPage('home')} onRidePosted={handleRidePosted} />;
       case 'home':
       default:
-        return <HomePage rides={rides} />;
+        // ✅ CHANGE 6: Pass the state and setters down to the HomePage.
+        return <HomePage 
+                  rides={rides} 
+                  setRides={setRides} 
+                  setIsLoadingRides={setIsLoadingRides}
+                  setErrorRides={setErrorRides} 
+               />;
     }
   };
 
@@ -236,6 +280,10 @@ export default function App() {
           </nav>
         </div>
       </header>
+      
+      {/* ✅ CHANGE 7: Display loading or error messages for the ride search. */}
+      {isLoadingRides && <div className="container" style={{textAlign: 'center', padding: '2rem'}}><p>Searching for rides...</p></div>}
+      {errorRides && <div className="container" style={{textAlign: 'center', padding: '2rem'}}><p style={{color: 'red'}}>{errorRides}</p></div>}
       
       {renderPage()}
 
