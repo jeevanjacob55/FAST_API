@@ -1,6 +1,6 @@
 # app/schemas.py
 from pydantic import BaseModel
-from datetime import date, time
+from datetime import date, time, datetime
 from typing import Optional
 # Auth
 class UserCreate(BaseModel):
@@ -41,3 +41,19 @@ class RideSearch(BaseModel):
     start_lon: float
     end_lat: float
     end_lon: float
+    tolerance: float = 5.0 # km tolerance for matching
+
+#BOOKING SCHEMAS
+class BookingCreate(BaseModel):
+    # Ideally user_id is derived from auth; for now optional (defaults to 1)
+    user_id: Optional[int] = None
+
+class BookingOut(BaseModel):
+    id: int
+    ride_id: int
+    user_id: int
+    status: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True

@@ -11,9 +11,8 @@ psycopg2-binary           # PostgreSQL driver
 alembic                   # DB migrations
 
 # Validation & Security
-passlib[bcrypt]           # Password hashing
-python-jose[cryptography] # JWT token handling
-
+passlib[bcrypt]           # Password hashing # JWT token handling
+python-jose[cryptography]
 # Form & File Uploads
 python-multipart
 
@@ -28,7 +27,7 @@ black
 flake8
 isort
 mypy                       # Optional: static type checking
-jose
+python-jose[cryptography]
 requests
 polyline
 haversine
