@@ -1,53 +1,37 @@
-# app/main.py
-
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from .db import engine # Import engine and Base from db.py
+from fastapi.middleware.cors import CORSMiddleware # Make sure this is imported
+
+from .db import engine
 from .models import Base
 from .api import auth, rides
-from app.api import bookings
 
-# This is where the table creation logic now lives
-# It connects the engine to the metadata from Base
+# This creates the database tables
 Base.metadata.create_all(bind=engine)
 
-# Create the main FastAPI app instance
 app = FastAPI(
-    title="Carpooling API"
+    title="Rushr API"
 )
 
-# Define the list of origins that are allowed to make requests
-# For development, you'll allow your React app's address
+# --- This is the crucial section ---
+# It must come before you include your routers.
 origins = [
-    "http://localhost:3000",
-    "http://localhost:5173", # Common port for Vite React apps
+    "http://localhost:5173", # For Vite
+    "http://localhost:3000", # For Create React App
 ]
 
-# Add the CORS middleware to your application
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Allows specific origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_origins=origins,       # List of allowed origins
+    allow_credentials=True,    # Allows cookies
+    allow_methods=["*"],         # Allows all methods (GET, POST, OPTIONS, etc.)
+    allow_headers=["*"],         # Allows all headers
 )
-# This decorator tells FastAPI to run this function once, on startup
-# @app.on_event("startup")
-# def on_startup():
-#     """
-#     Creates database tables if they don't exist.
-#     """
-#     print("Creating database tables...")
-#     create_tables()
-#     print("Tables created.")
+# ------------------------------------
 
-
-# Include your routers
+# Include your API routers AFTER the middleware
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
-# app.include_router(rides.router, prefix="/rides", tags=["Rides"])
 app.include_router(rides.router, prefix="/rides", tags=["Rides"])
-# app.include_router(bookings.router, prefix="/bookings", tags=["Bookings"])
-app.include_router(bookings.router, prefix="/rides", tags=["Rides"])
-@app.get("/", tags=["Root"])
+
+@app.get("/")
 def read_root():
     return {"status": "API is running"}

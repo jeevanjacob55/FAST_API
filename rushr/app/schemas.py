@@ -53,12 +53,20 @@ class RideOut(BaseModel):
     class Config:
         from_attributes = True # ✅ FIXED: Changed orm_mode to from_attributes
 
+# class RideSearch(BaseModel):
+#     start_lat: float
+#     start_lon: float
+#     end_lat: float
+#     end_lon: float
+#     tolerance: float = 5.0
+
+# ... other schemas
+
+# CHANGE THIS SCHEMA
 class RideSearch(BaseModel):
-    start_lat: float
-    start_lon: float
-    end_lat: float
-    end_lon: float
-    tolerance: float = 5.0
+    leaving_from: str
+    going_to: str
+    # tolerance: float = 5.0 # This can be a query parameter instead
 
 # --- Booking Schemas ---
 class BookingCreate(BaseModel):
