@@ -10,6 +10,14 @@ from app.api import bookings
 app = FastAPI(
     title="Carpooling API"
 )
+# 1️⃣  Auth endpoints
+app.include_router(auth.router, prefix="/auth", tags=["Auth"])
+
+# 2️⃣  Ride CRUD endpoints
+app.include_router(rides.router, prefix="/rides", tags=["Rides"])
+
+# 3️⃣  Booking endpoints (book / cancel) live under /rides
+app.include_router(bookings.router, prefix="/rides", tags=["Rides"])
 
 # This decorator tells FastAPI to run this function once, on startup
 @app.on_event("startup")
@@ -22,13 +30,8 @@ def on_startup():
     print("Tables created.")
 
 
-# Include your routers
-app.include_router(auth.router, prefix="/auth", tags=["Auth"])
-# app.include_router(rides.router, prefix="/rides", tags=["Rides"])
-app.include_router(rides.router)
-# app.include_router(bookings.router, prefix="/bookings", tags=["Bookings"])
-app.include_router(bookings.router, prefix="/rides", tags=["Rides"])
-
 @app.get("/", tags=["Root"])
 def read_root():
     return {"status": "API is running"}
+
+
