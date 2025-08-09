@@ -1,51 +1,67 @@
-# app/schemas.py
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import date, time, datetime
 from typing import Optional
-# Auth
+
+# --- Auth Schemas ---
 class UserCreate(BaseModel):
-    username: str
+    full_name: str
+    email: EmailStr
+    contact_number: str
+    aadhaar_number: str
     password: str
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+class OTPVerify(BaseModel):
+    email: EmailStr
+    otp: str
 
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
-# Rides
-# class RideCreate(BaseModel):
-#     leaving_from: str
-#     going_to: str
-#     seats: int
+# --- User Schemas ---
+class UserOut(BaseModel):
+    id: int
+    full_name: str
+    email: EmailStr
+    contact_number: str
+    role: str
+    class Config:
+        from_attributes = True
 
+class DriverRegister(BaseModel):
+    driving_license: str
+    vehicle_number_plate: str
+
+# --- Ride Schemas ---
 class RideCreate(BaseModel):
-    driver_username: str
     leaving_from: str
     going_to: str
-    date: Optional[date]
-    time: Optional[time]
     seats: int
-    polyline: Optional[str] = None
+    # Removed other fields to match your latest auth.py logic
+
 class RideOut(BaseModel):
     id: int
     leaving_from: str
     going_to: str
     seats: int
     driver_id: int
-    polyline: str | None = None  # so frontend can draw the route
-
+    polyline: str | None = None
     class Config:
-        orm_mode = True
+        from_attributes = True # ✅ FIXED: Changed orm_mode to from_attributes
 
 class RideSearch(BaseModel):
     start_lat: float
     start_lon: float
     end_lat: float
     end_lon: float
-    tolerance: float = 5.0 # km tolerance for matching
+    tolerance: float = 5.0
 
-#BOOKING SCHEMAS
+# --- Booking Schemas ---
 class BookingCreate(BaseModel):
-    # Ideally user_id is derived from auth; for now optional (defaults to 1)
     user_id: Optional[int] = None
 
 class BookingOut(BaseModel):
@@ -54,6 +70,5 @@ class BookingOut(BaseModel):
     user_id: int
     status: str
     created_at: datetime
-
     class Config:
-        orm_mode = True
+        from_attributes = True # ✅ FIXED: Changed orm_mode to from_attributes
