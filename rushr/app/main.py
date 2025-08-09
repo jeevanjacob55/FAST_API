@@ -1,6 +1,7 @@
 # app/main.py
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from .db import engine # Import engine and Base from db.py
 from .models import Base
 from .api import auth, rides
@@ -15,6 +16,21 @@ app = FastAPI(
     title="Carpooling API"
 )
 
+# Define the list of origins that are allowed to make requests
+# For development, you'll allow your React app's address
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173", # Common port for Vite React apps
+]
+
+# Add the CORS middleware to your application
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allows specific origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 # This decorator tells FastAPI to run this function once, on startup
 # @app.on_event("startup")
 # def on_startup():
@@ -29,7 +45,7 @@ app = FastAPI(
 # Include your routers
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 # app.include_router(rides.router, prefix="/rides", tags=["Rides"])
-app.include_router(rides.router)
+app.include_router(rides.router, prefix="/rides", tags=["Rides"])
 # app.include_router(bookings.router, prefix="/bookings", tags=["Bookings"])
 app.include_router(bookings.router, prefix="/rides", tags=["Rides"])
 @app.get("/", tags=["Root"])
